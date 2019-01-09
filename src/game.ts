@@ -84,12 +84,12 @@ const camera = Camera.instance
 
 // Add Gnark
 let gnark = new Entity()
-gnark.set(new Transform({
+gnark.add(new Transform({
   position: new Vector3(5, 0, 5),
   scale: new Vector3(0.75, 0.75, 0.75),
   rotation: Quaternion.Euler(0, 0, 0)
 }))
-gnark.set(new GLTFShape('models/gnark.gltf'))
+gnark.add(new GLTFShape('models/gnark.gltf'))
 
 // Add animations
 const walkClip = new AnimationClip('walk')
@@ -103,7 +103,7 @@ gnark.get(GLTFShape).addClip(raiseDeadClip)
 walkClip.play()
 
 // add a path data component
-gnark.set(new LerpData())
+gnark.add(new LerpData())
 
 // Add Gnark to engine
 engine.addEntity(gnark)
