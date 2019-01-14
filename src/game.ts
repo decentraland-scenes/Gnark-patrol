@@ -26,3 +26,14 @@ gnark.get(GLTFShape).addClip(walkClip)
 
 // Activate walk animation
 walkClip.play()
+
+
+// Walk System
+export class GnarkWalk {
+  update() {
+    let increment = Vector3.Forward().scale(0.05)
+    gnark.get(Transform).translate(increment)
+  }
+}
+
+engine.addSystem(new GnarkWalk())
