@@ -1,10 +1,19 @@
 
+// Coordinates of path to patrol
+const point1 = new Vector3(5, 0, 5)
+const point2 = new Vector3(5, 0, 15)
+const point3 = new Vector3(15, 0, 15)
+const point4 = new Vector3(15, 0, 5)
+const path: Vector3[] = [point1, point2, point3, point4]
+
+
 // LerpData component
 @Component("lerpData")
 export class LerpData {
-  origin: Vector3 = new Vector3(5, 0, 5)
-  target: Vector3 = new Vector3(5, 0, 15)
- fraction: number = 0
+  array: Vector3[] = path
+  origin: number = 0
+  target: number = 1
+  fraction: number = 0
 }
 
 
@@ -44,17 +53,23 @@ walkClip.play()
 export class GnarkWalk {
   update(dt: number) {
     let transform = gnark.get(Transform)
-    let lerp = gnark.get(LerpData)
-    if (lerp.fraction < 1) {
-       lerp.fraction += dt / 6
+    let path = gnark.get(LerpData)
+    path.fraction += dt/6
+    if (path.fraction < 1) {
       transform.position = Vector3.Lerp(
-        lerp.origin,
-        lerp.target,
-        lerp.fraction
+        path.array[path.origin],
+        path.array[path.target],
+        path.fraction
       )
+     
+    } else {
+      path.origin = path.target
+      path.target += 1
+      if (path.target >= path.array.length) {
+        path.target = 0
       }
-     else {
-       walkClip.pause()
+      path.fraction = 0
+      transform.lookAt(path.array[path.target])
     }
   }
 }
