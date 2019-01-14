@@ -30,8 +30,8 @@ walkClip.play()
 
 // Walk System
 export class GnarkWalk {
-  update() {
-    let increment = Vector3.Forward().scale(0.05)
+  update(dt: number) {
+    let increment = Vector3.Forward().scale(dt * 1.5)
     gnark.get(Transform).translate(increment)
   }
 }
