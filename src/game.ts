@@ -6,7 +6,6 @@ const point3 = new Vector3(15, 0, 15)
 const point4 = new Vector3(15, 0, 5)
 const path: Vector3[] = [point1, point2, point3, point4]
 
-
 // LerpData component
 @Component("lerpData")
 export class LerpData {
@@ -16,6 +15,12 @@ export class LerpData {
   fraction: number = 0
 }
 
+// Rotate component
+@Component("turnTime")
+export class TurnTime {
+  totalTime: number = 0.9
+  timeLeft: number = 0.9
+}
 
 // Create temple
 const temple = new Entity()
@@ -38,40 +43,104 @@ gnark.add(new GLTFShape('models/gnark.gltf'))
 // Add LerpData component to Gnark
 gnark.add(new LerpData())
 
+// Add TurnTime component to Gnark
+gnark.add(new TurnTime())
+
 // Add Gnark to engine
 engine.addEntity(gnark)
 
 // Add walk animation
 const walkClip = new AnimationClip('walk')
 gnark.get(GLTFShape).addClip(walkClip)
+const turnRClip = new AnimationClip('turnRight', { loop: false })
+gnark.get(GLTFShape).addClip(turnRClip)
+const raiseDeadClip = new AnimationClip('raiseDead')
+gnark.get(GLTFShape).addClip(raiseDeadClip)
+
+// Object that tracks user position and rotation
+const camera = Camera.instance
 
 // Activate walk animation
 walkClip.play()
-
 
 // Walk System
 export class GnarkWalk {
   update(dt: number) {
     let transform = gnark.get(Transform)
     let path = gnark.get(LerpData)
-    path.fraction += dt/6
-    if (path.fraction < 1) {
-      transform.position = Vector3.Lerp(
-        path.array[path.origin],
-        path.array[path.target],
-        path.fraction
-      )
-     
-    } else {
-      path.origin = path.target
-      path.target += 1
-      if (path.target >= path.array.length) {
-        path.target = 0
+    let time = gnark.get(TurnTime)
+    if (walkClip.playing) {
+      if (path.fraction < 1) {
+        path.fraction += dt/6
+        transform.position = Vector3.Lerp(
+          path.array[path.origin],
+          path.array[path.target],
+          path.fraction
+        )
+      
+      } else {
+        walkClip.pause()
+        turnRClip.play()
+        path.origin = path.target
+        path.target += 1
+        if (path.target >= path.array.length) {
+          path.target = 0
+        }
+        path.fraction = 0
+        transform.lookAt(path.array[path.target])
       }
-      path.fraction = 0
-      transform.lookAt(path.array[path.target])
+    }
+    else if (turnRClip.playing) {
+      if (time.timeLeft > 0) {
+        time.timeLeft -= dt
+      } else {
+        time.timeLeft = time.totalTime
+        walkClip.play()
+        path.fraction = 0
+      }
     }
   }
 }
 
 engine.addSystem(new GnarkWalk())
+
+
+
+
+// React and stop walking when the user gets close enough
+
+export class BattleCry {
+  update() {
+    let transform = gnark.get(Transform)
+    let path = gnark.get(LerpData)
+    let dist = distance(transform.position, camera.position)
+    if ( dist < 16) {
+      //gnark.get(GLTFShape).addClip(new AnimationClip('raiseDead'))
+      raiseDeadClip.play()
+      walkClip.pause()
+      turnRClip.pause()
+      transform.lookAt(camera.position)
+    }
+    else if (raiseDeadClip.playing){
+      raiseDeadClip.pause()  
+      //gnarkModel.removeClip(raiseDeadClip)
+      walkClip.play()
+      transform.lookAt(path.array[path.target])
+    }
+  }
+}
+
+engine.addSystem(new BattleCry())
+
+// Get distance
+/* 
+Note:
+This function really returns distance squared, as it's a lot more efficient to calculate.
+The square root operation is expensive and isn't really necessary if we compare the result to squared values.
+We also use {x,z} not {x,y}. The y-coordinate is how high up it is.
+*/
+function distance(pos1: Vector3, pos2: Vector3): number {
+  const a = pos1.x - pos2.x
+  const b = pos1.z - pos2.z
+  return a * a + b * b
+}
