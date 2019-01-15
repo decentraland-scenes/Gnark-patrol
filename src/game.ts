@@ -61,13 +61,14 @@ gnark.get(GLTFShape).addClip(turnRClip)
 const raiseDeadClip = new AnimationClip('raiseDead')
 gnark.get(GLTFShape).addClip(raiseDeadClip)
 
+
 // Activate walk animation
 walkClip.play()
 
 // Walk System
 export class GnarkWalk {
   update(dt: number) {
-    if (!gnark.has(TimeOut)){
+    if (!gnark.has(TimeOut) && !raiseDeadClip.playing ){
       let transform = gnark.get(Transform)
       let path = gnark.get(LerpData)
       walkClip.playing = true
@@ -113,3 +114,42 @@ export class WaitSystem {
 }
 
 engine.addSystem(new WaitSystem())
+
+// React and stop walking when the user gets close enough
+
+export class BattleCry {
+  update() {
+    let transform = gnark.get(Transform)
+    let path = gnark.get(LerpData)
+    let dist = distance(transform.position, camera.position)
+    if ( dist < 16) {
+      raiseDeadClip.play()
+      walkClip.playing = false
+      turnRClip.playing = false
+      transform.lookAt(camera.position)
+    }
+    else if (raiseDeadClip.playing){
+      raiseDeadClip.pause()  
+      gnark.remove(TimeOut)
+      transform.lookAt(path.array[path.target])
+    }
+  }
+}
+
+engine.addSystem(new BattleCry())
+
+// Object that tracks user position and rotation
+const camera = Camera.instance
+
+// Get distance
+/* 
+Note:
+This function really returns distance squared, as it's a lot more efficient to calculate.
+The square root operation is expensive and isn't really necessary if we compare the result to squared values.
+We also use {x,z} not {x,y}. The y-coordinate is how high up it is.
+*/
+function distance(pos1: Vector3, pos2: Vector3): number {
+  const a = pos1.x - pos2.x
+  const b = pos1.z - pos2.z
+  return a * a + b * b
+}
