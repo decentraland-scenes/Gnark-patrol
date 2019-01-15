@@ -6,6 +6,7 @@ const point3 = new Vector3(15, 0, 15)
 const point4 = new Vector3(15, 0, 5)
 const path: Vector3[] = [point1, point2, point3, point4]
 
+const TURN_TIME = 0.9
 
 // LerpData component
 @Component("lerpData")
@@ -16,6 +17,17 @@ export class LerpData {
   fraction: number = 0
 }
 
+// Rotate component
+@Component("timeOut")
+export class TimeOut {
+  timeLeft: number
+  constructor( time: number){
+    this.timeLeft = time
+  }
+}
+
+// component group to hold all entities with a timeOut
+export const paused = engine.getComponentGroup(TimeOut)
 
 // Create temple
 const temple = new Entity()
@@ -44,34 +56,60 @@ engine.addEntity(gnark)
 // Add walk animation
 const walkClip = new AnimationClip('walk')
 gnark.get(GLTFShape).addClip(walkClip)
+const turnRClip = new AnimationClip('turnRight', { loop: false })
+gnark.get(GLTFShape).addClip(turnRClip)
+const raiseDeadClip = new AnimationClip('raiseDead')
+gnark.get(GLTFShape).addClip(raiseDeadClip)
 
 // Activate walk animation
 walkClip.play()
 
-
 // Walk System
 export class GnarkWalk {
   update(dt: number) {
-    let transform = gnark.get(Transform)
-    let path = gnark.get(LerpData)
-    path.fraction += dt/6
-    if (path.fraction < 1) {
-      transform.position = Vector3.Lerp(
-        path.array[path.origin],
-        path.array[path.target],
-        path.fraction
-      )
-     
-    } else {
-      path.origin = path.target
-      path.target += 1
-      if (path.target >= path.array.length) {
-        path.target = 0
+    if (!gnark.has(TimeOut)){
+      let transform = gnark.get(Transform)
+      let path = gnark.get(LerpData)
+      walkClip.playing = true
+      if (path.fraction < 1) {
+        path.fraction += dt/6
+        transform.position = Vector3.Lerp(
+          path.array[path.origin],
+          path.array[path.target],
+          path.fraction
+        ) 
+      } else {
+        path.origin = path.target
+        path.target += 1
+        if (path.target >= path.array.length) {
+          path.target = 0
+        }
+        path.fraction = 0
+        transform.lookAt(path.array[path.target])
+        walkClip.pause()
+        turnRClip.play()
+        gnark.set(new TimeOut(TURN_TIME))
       }
-      path.fraction = 0
-      transform.lookAt(path.array[path.target])
     }
   }
 }
 
 engine.addSystem(new GnarkWalk())
+
+// Wait System
+export class WaitSystem {
+  update(dt: number) {
+    for (let ent of paused.entities){
+      let time = ent.getOrNull(TimeOut)
+      if (time){
+        if (time.timeLeft > 0) {
+          time.timeLeft -= dt
+        } else {
+          ent.remove(TimeOut)
+        }
+      }
+    }
+  }
+}
+
+engine.addSystem(new WaitSystem())
