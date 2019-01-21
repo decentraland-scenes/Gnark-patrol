@@ -123,14 +123,13 @@ export class BattleCry {
     let path = gnark.get(LerpData)
     let dist = distance(transform.position, camera.position)
     if ( dist < 16) {
-      raiseDeadClip.play()
+      raiseDeadClip.playing = true
       walkClip.playing = false
       turnRClip.playing = false
       transform.lookAt(camera.position)
     }
     else if (raiseDeadClip.playing){
-      raiseDeadClip.pause()  
-      gnark.remove(TimeOut)
+      raiseDeadClip.pause()
       transform.lookAt(path.array[path.target])
     }
   }
