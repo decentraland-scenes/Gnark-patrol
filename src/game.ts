@@ -43,8 +43,7 @@ engine.addEntity(temple)
 // Create Gnark
 let gnark = new Entity()
 gnark.addComponent(new Transform({
- position: new Vector3(5, 0, 5),
- scale: new Vector3(0.75, 0.75, 0.75)
+ position: new Vector3(5, 0, 5)
 }))
 gnark.addComponent(new GLTFShape('models/gnark.gltf'))
 
@@ -72,7 +71,7 @@ walkClip.play()
 // Walk System
 export class GnarkWalk {
   update(dt: number) {
-    if (!gnark.has(TimeOut) && !raiseDeadClip.playing ){
+    if (!gnark.hasComponent(TimeOut) && !raiseDeadClip.playing ){
       let transform = gnark.getComponent(Transform)
       let path = gnark.getComponent(LerpData)
       walkClip.playing = true
@@ -93,7 +92,7 @@ export class GnarkWalk {
         transform.lookAt(path.array[path.target])
         walkClip.pause()
         turnRClip.play()
-        gnark.set(new TimeOut(TURN_TIME))
+        gnark.addComponent(new TimeOut(TURN_TIME))
       }
     }
   }
@@ -105,7 +104,7 @@ engine.addSystem(new GnarkWalk())
 export class WaitSystem {
   update(dt: number) {
     for (let ent of paused.entities){
-      let time = ent.getOrNull(TimeOut)
+      let time = ent.getComponentOrNull(TimeOut)
       if (time){
         if (time.timeLeft > 0) {
           time.timeLeft -= dt
