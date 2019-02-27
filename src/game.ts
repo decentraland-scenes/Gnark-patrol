@@ -31,8 +31,8 @@ export const paused = engine.getComponentGroup(TimeOut)
 
 // Create temple
 const temple = new Entity()
-temple.add(new GLTFShape('models/Temple.glb'))
-temple.add(new Transform({
+temple.addComponent(new GLTFShape('models/Temple.glb'))
+temple.addComponent(new Transform({
   position: new Vector3(16, 0, 16),
   scale: new Vector3(1.6, 1.6, 1.6)
 }))
@@ -42,16 +42,16 @@ engine.addEntity(temple)
 
 // Create Gnark
 let gnark = new Entity()
-gnark.add(new Transform({
+gnark.addComponent(new Transform({
  position: new Vector3(5, 0, 5),
  scale: new Vector3(0.75, 0.75, 0.75)
 }))
-gnark.add(new GLTFShape('models/gnark.gltf'))
+gnark.addComponent(new GLTFShape('models/gnark.gltf'))
 
 let gnarkAnimator = new Animator()
-gnark.add(gnarkAnimator)
+gnark.addComponent(gnarkAnimator)
 // Add LerpData component to Gnark
-gnark.add(new LerpData())
+gnark.addComponent(new LerpData())
 
 // Add Gnark to engine
 engine.addEntity(gnark)
@@ -73,8 +73,8 @@ walkClip.play()
 export class GnarkWalk {
   update(dt: number) {
     if (!gnark.has(TimeOut) && !raiseDeadClip.playing ){
-      let transform = gnark.get(Transform)
-      let path = gnark.get(LerpData)
+      let transform = gnark.getComponent(Transform)
+      let path = gnark.getComponent(LerpData)
       walkClip.playing = true
       if (path.fraction < 1) {
         path.fraction += dt/12
@@ -110,7 +110,7 @@ export class WaitSystem {
         if (time.timeLeft > 0) {
           time.timeLeft -= dt
         } else {
-          ent.remove(TimeOut)
+          ent.removeComponent(TimeOut)
         }
       }
     }
@@ -123,8 +123,8 @@ engine.addSystem(new WaitSystem())
 
 export class BattleCry {
   update() {
-    let transform = gnark.get(Transform)
-    let path = gnark.get(LerpData)
+    let transform = gnark.getComponent(Transform)
+    let path = gnark.getComponent(LerpData)
     let dist = distance(transform.position, camera.position)
     if ( dist < 16) {
       raiseDeadClip.playing = true
