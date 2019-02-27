@@ -1,9 +1,9 @@
 
 // Coordinates of path to patrol
-const point1 = new Vector3(5, 0, 5)
-const point2 = new Vector3(5, 0, 15)
-const point3 = new Vector3(15, 0, 15)
-const point4 = new Vector3(15, 0, 5)
+const point1 = new Vector3(8, 0, 8)
+const point2 = new Vector3(8, 0, 24)
+const point3 = new Vector3(24, 0, 24)
+const point4 = new Vector3(24, 0, 8)
 const path: Vector3[] = [point1, point2, point3, point4]
 
 const TURN_TIME = 0.9
@@ -31,9 +31,10 @@ export const paused = engine.getComponentGroup(TimeOut)
 
 // Create temple
 const temple = new Entity()
-temple.add(new GLTFShape('models/Temple.gltf'))
+temple.add(new GLTFShape('models/Temple.glb'))
 temple.add(new Transform({
-  position: new Vector3(10, 0, 10)
+  position: new Vector3(16, 0, 16),
+  scale: new Vector3(1.6, 1.6, 1.6)
 }))
 
 // Add temple to engine
@@ -47,6 +48,8 @@ gnark.add(new Transform({
 }))
 gnark.add(new GLTFShape('models/gnark.gltf'))
 
+let gnarkAnimator = new Animator()
+gnark.add(gnarkAnimator)
 // Add LerpData component to Gnark
 gnark.add(new LerpData())
 
@@ -55,11 +58,12 @@ engine.addEntity(gnark)
 
 // Add walk animation
 const walkClip = new AnimationClip('walk')
-gnark.get(GLTFShape).addClip(walkClip)
-const turnRClip = new AnimationClip('turnRight', { loop: false })
-gnark.get(GLTFShape).addClip(turnRClip)
+gnarkAnimator.addClip(walkClip)
+const turnRClip = new AnimationClip('turnRight')
+turnRClip.looping = false
+gnarkAnimator.addClip(turnRClip)
 const raiseDeadClip = new AnimationClip('raiseDead')
-gnark.get(GLTFShape).addClip(raiseDeadClip)
+gnarkAnimator.addClip(raiseDeadClip)
 
 
 // Activate walk animation
@@ -73,7 +77,7 @@ export class GnarkWalk {
       let path = gnark.get(LerpData)
       walkClip.playing = true
       if (path.fraction < 1) {
-        path.fraction += dt/6
+        path.fraction += dt/12
         transform.position = Vector3.Lerp(
           path.array[path.origin],
           path.array[path.target],
