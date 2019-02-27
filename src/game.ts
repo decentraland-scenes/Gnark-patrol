@@ -57,12 +57,12 @@ gnark.addComponent(new LerpData())
 engine.addEntity(gnark)
 
 // Add walk animation
-const walkClip = new AnimationClip('walk')
+const walkClip = new AnimationState('walk')
 gnarkAnimator.addClip(walkClip)
-const turnRClip = new AnimationClip('turnRight')
+const turnRClip = new AnimationState('turnRight')
 turnRClip.looping = false
 gnarkAnimator.addClip(turnRClip)
-const raiseDeadClip = new AnimationClip('raiseDead')
+const raiseDeadClip = new AnimationState('raiseDead')
 gnarkAnimator.addClip(raiseDeadClip)
 
 
