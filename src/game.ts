@@ -34,6 +34,7 @@ const temple = new Entity()
 temple.addComponent(new GLTFShape('models/Temple.glb'))
 temple.addComponent(new Transform({
   position: new Vector3(16, 0, 16),
+  rotation: Quaternion.Euler(0,180,0),
   scale: new Vector3(1.6, 1.6, 1.6)
 }))
 
