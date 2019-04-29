@@ -46,7 +46,7 @@ let gnark = new Entity()
 gnark.addComponent(new Transform({
  position: new Vector3(5, 0, 5)
 }))
-gnark.addComponent(new GLTFShape('models/gnark.gltf'))
+gnark.addComponent(new GLTFShape('models/gnark.glb'))
 
 let gnarkAnimator = new Animator()
 gnark.addComponent(gnarkAnimator)
@@ -127,13 +127,16 @@ export class BattleCry {
     let path = gnark.getComponent(LerpData)
     let dist = distance(transform.position, camera.position)
     if ( dist < 16) {
-      raiseDeadClip.playing = true
-      walkClip.playing = false
-      turnRClip.playing = false
+      if(raiseDeadClip.playing == false){
+        raiseDeadClip.reset()
+        raiseDeadClip.playing = true
+        walkClip.playing = false
+        turnRClip.playing = false
+      }
       transform.lookAt(camera.position)
     }
     else if (raiseDeadClip.playing){
-      raiseDeadClip.pause()
+      raiseDeadClip.stop()
       transform.lookAt(path.array[path.target])
     }
   }
