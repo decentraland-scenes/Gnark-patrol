@@ -37,7 +37,7 @@ Learn more about how to build your own scenes in our [documentation](https://doc
 
 ## 3D models
 
-The 3D model for the character used in the scene is an asset courtesy of [BitGem](https://assetstore.unity.com). The model is not free to use, but with the coupon code `DecentralandKing` you can obtain it with a 100% discount on their site.
+The 3D model for the character used in the scene is an asset courtesy of [BitGem]( https://shop.bitgem3d.com). The model is not free to use, but with the coupon code `DecentralandKing` you can obtain it with a 100% discount on their site.
 
 Other 3D models in this scene are developed by Decentraland's art team and free to use under the Apache 2 licence.
 
