@@ -46,7 +46,10 @@ let gnark = new Entity()
 gnark.addComponent(new Transform({
  position: new Vector3(5, 0, 5)
 }))
-gnark.addComponent(new GLTFShape('models/gnark.glb'))
+
+let gnarkShape = new GLTFShape('models/gnark.glb')
+
+gnark.addComponent(gnarkShape)
 
 let gnarkAnimator = new Animator()
 gnark.addComponent(gnarkAnimator)
@@ -75,7 +78,8 @@ export class GnarkWalk {
     if (!gnark.hasComponent(TimeOut) && !raiseDeadClip.playing ){
       let transform = gnark.getComponent(Transform)
       let path = gnark.getComponent(LerpData)
-      walkClip.playing = true
+	  walkClip.playing = true
+	  turnRClip.playing = false
       if (path.fraction < 1) {
         path.fraction += dt/12
         transform.position = Vector3.Lerp(
@@ -92,7 +96,8 @@ export class GnarkWalk {
         path.fraction = 0
         transform.lookAt(path.array[path.target])
         walkClip.pause()
-        turnRClip.play()
+		turnRClip.play()
+		turnRClip.looping = false
         gnark.addComponent(new TimeOut(TURN_TIME))
       }
     }
