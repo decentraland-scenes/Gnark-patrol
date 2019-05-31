@@ -35,6 +35,13 @@ Gnark walks in circles, patrolling his temple. If you approach him too much, he 
 
 Learn more about how to build your own scenes in our [documentation](https://docs.decentraland.org/) site.
 
+## 3D models
+
+The 3D model for the character used in the scene is an asset courtesy of [BitGem]( https://shop.bitgem3d.com). The model is not free to use, but with the coupon code `DecentralandKing` you can obtain it with a 100% discount on their site.
+
+Other 3D models in this scene are developed by Decentraland's art team and free to use under the Apache 2 licence.
+
 ## Copyright info
 
 This scene is protected with a standard Apache 2 licence. See the terms and conditions in the [LICENSE](/LICENSE) file.
+
