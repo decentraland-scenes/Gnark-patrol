@@ -137,8 +137,9 @@ export class BattleCry {
         raiseDeadClip.playing = true
         walkClip.playing = false
         turnRClip.playing = false
-      }
-      transform.lookAt(camera.position)
+	  }
+	  let playerPos = new Vector3(camera.position.x, 0, camera.position.z)
+      transform.lookAt(playerPos)
     }
     else if (raiseDeadClip.playing){
       raiseDeadClip.stop()
