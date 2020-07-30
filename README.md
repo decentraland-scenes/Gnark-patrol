@@ -4,36 +4,45 @@ A scene that shows a character walking along a fixed path, using lerp over each 
 
 ![](screenshot/screenshot.png)
 
-[Explore the scene](https://gnark-patrol-ypvlmwbkhe.now.sh): this link takes you to a copy of the scene deployed to a remote server where you can interact with it just as if you were running `dcl start` locally.
+This scene shows you:
+
+- How to add 3D models to a scene and call their animations
+- How to use a system to make an NPC walk around a predetermined path
+- How to check the proximity of a player to an NPC and react
+
+
+Read a tutorial blog post about this scene:
+
+- [Part 1](https://decentraland.org/blog/tutorials/motion-animations-in-SDK-5/)
+- [Part 2](https://decentraland.org/blog/tutorials/motion-animations-in-SDK-5-part-2/)
+
+## Try it out
 
 **Install the CLI**
 
-Download and install the Decentraland CLI by running the following command
+Download and install the Decentraland CLI by running the following command:
 
 ```bash
 npm i -g decentraland
 ```
 
-For a more details, follow the steps in the [Installation guide](https://docs.decentraland.org/documentation/installation-guide/).
-
-
 **Previewing the scene**
 
-Once you've installed the CLI, download this example and navigate to its directory from your terminal or command prompt.
-
-_from the scene directory:_
+Download this example and navigate to its directory, then run:
 
 ```
 $:  dcl start
 ```
 
-Any dependencies are installed and then the CLI will open the scene in a new browser tab automatically.
+Any dependencies are installed and then the CLI opens the scene in a new browser tab.
 
-**Usage**
+**Scene Usage**
 
 Gnark walks in circles, patrolling his temple. If you approach him too much, he will face you and scream a battle cry!
 
 Learn more about how to build your own scenes in our [documentation](https://docs.decentraland.org/) site.
+
+If something doesn’t work, please [file an issue](https://github.com/decentraland-scenes/Awesome-Repository/issues/new).
 
 ## 3D models
 
