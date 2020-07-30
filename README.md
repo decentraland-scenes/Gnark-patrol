@@ -9,6 +9,8 @@ This scene shows you:
 - How to add 3D models to a scene and call their animations
 - How to use a system to make an NPC walk around a predetermined path
 - How to check the proximity of a player to an NPC and react
+- How to rotate an entity to face the player
+- How to create a custom component to store custom data
 
 
 Read a tutorial blog post about this scene:
