@@ -81,9 +81,7 @@ gnark.addComponent(new LerpData())
 // Add Gnark to engine
 engine.addEntity(gnark)
 
-// Animations
-let gnarkAnimator = new Animator()
-gnark.addComponent(gnarkAnimator)
+// Add walk animation
 const walkClip = new AnimationState('walk')
 gnarkAnimator.addClip(walkClip)
 const turnRClip = new AnimationState('turnRight', { looping: false })
@@ -94,22 +92,8 @@ gnarkAnimator.addClip(raiseDeadClip)
 // Activate walk animation
 walkClip.play()
 
-///// WALK ALONG FIXED PATH /////
-
-// Define custom LerpData component
-@Component('lerpData')
-export class LerpData {
-  array: Vector3[] = path
-  origin: number = 0
-  target: number = 1
-  fraction: number = 0
-}
-
-// Add custom LerpData component to Gnark
-gnark.addComponent(new LerpData())
-
 // Walk System
-export class GnarkWalk implements ISystem {
+export class GnarkWalk {
   update(dt: number) {
     if (!gnark.hasComponent(TimeOut) && !raiseDeadClip.playing) {
       let transform = gnark.getComponent(Transform)
@@ -122,15 +106,12 @@ export class GnarkWalk implements ISystem {
           path.fraction
         )
       } else {
-        // path segment finished > next segment
         path.origin = path.target
         path.target += 1
         if (path.target >= path.array.length) {
-          // whole path finished > back to start
           path.target = 0
         }
         path.fraction = 0
-        // face new target
         transform.lookAt(path.array[path.target])
         turnRClip.play()
         gnark.addComponent(
@@ -145,25 +126,8 @@ export class GnarkWalk implements ISystem {
 
 engine.addSystem(new GnarkWalk())
 
-///// PAUSE WHILE ROTATING /////
-
-// time to pause
-const TURN_TIME = 0.9
-
-// Define custom Rotate component
-@Component('timeOut')
-export class TimeOut {
-  timeLeft: number
-  constructor(time: number) {
-    this.timeLeft = time
-  }
-}
-
-// Component group to hold all entities with a timeOut
-export const pausedGroup = engine.getComponentGroup(TimeOut)
-
 // Wait System
-export class WaitSystem implements ISystem {
+export class WaitSystem {
   update(dt: number) {
     for (let ent of paused.entities) {
       let time = ent.getComponentOrNull(TimeOut)
@@ -183,9 +147,9 @@ export class WaitSystem implements ISystem {
 
 engine.addSystem(new WaitSystem())
 
-///// STOP AND DO BATTLE CRY WHEN PLAYER GETS TOO CLOSE /////
+// React and stop walking when the user gets close enough
 
-export class BattleCry implements ISystem {
+export class BattleCry {
   update() {
     let transform = gnark.getComponent(Transform)
     let path = gnark.getComponent(LerpData)
