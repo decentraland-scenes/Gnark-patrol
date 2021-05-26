@@ -148,50 +148,40 @@ export class WaitSystem {
 engine.addSystem(new WaitSystem())
 
 // React and stop walking when the user gets close enough
-
-export class BattleCry {
-  update() {
-    let transform = gnark.getComponent(Transform)
-    let path = gnark.getComponent(LerpData)
-    let dist = distance(transform.position, camera.position)
-    if (dist < 16) {
-      if (!path.yelling && !path.yellingAtPlayer) {
-        //path.yelling = true
-        path.yellingAtPlayer = true
-        const action: yellMessage = {
-          playerPos: camera.position,
-        }
-        sceneMessageBus.emit('yell', action)
+onPositionChangedObservable.add((eventData) => {
+  let transform = gnark.getComponent(Transform)
+  let path = gnark.getComponent(LerpData)
+  let dist = distance(transform.position, eventData.position)
+  if (dist < 16) {
+    if (!path.yelling && !path.yellingAtPlayer) {
+      path.yellingAtPlayer = true
+      const action: yellMessage = {
+        playerPos: camera.position,
       }
-    } else if (path.yellingAtPlayer) {
-      path.yellingAtPlayer = false
-      const action: walkMessage = {
-        gnarkPos: transform.position.clone(),
-        origin: path.origin,
-        target: path.target,
-        fraction: path.fraction,
-      }
-      sceneMessageBus.emit('walk', action)
+      sceneMessageBus.emit('yell', action)
     }
+  } else if (path.yellingAtPlayer) {
+    path.yellingAtPlayer = false
+    const action: walkMessage = {
+      gnarkPos: transform.position.clone(),
+      origin: path.origin,
+      target: path.target,
+      fraction: path.fraction,
+    }
+    sceneMessageBus.emit('walk', action)
   }
-}
+})
 
-engine.addSystem(new BattleCry())
-
-// Object that tracks user position and rotation
-const camera = Camera.instance
-
-sceneMessageBus.on('yell', (info: yellMessage) => {
+function startYelling(info: yellMessage) {
   raiseDeadClip.reset()
   raiseDeadClip.play()
   let transform = gnark.getComponent(Transform)
   transform.lookAt(new Vector3(info.playerPos.x, 0, info.playerPos.z))
   let path = gnark.getComponent(LerpData)
   path.yelling = true
-  //log(info.playerPos)
-})
+}
 
-sceneMessageBus.on('walk', (info: walkMessage) => {
+function stopYelling(info: walkMessage) {
   walkClip.play()
   let path = gnark.getComponent(LerpData)
   let transform = gnark.getComponent(Transform)
@@ -201,6 +191,17 @@ sceneMessageBus.on('walk', (info: walkMessage) => {
   path.fraction = info.fraction
   path.yelling = false
   transform.lookAt(path.array[path.target])
+}
+
+// Object that tracks user position and rotation
+const camera = Camera.instance
+
+sceneMessageBus.on('yell', (info: yellMessage) => {
+  startYelling(info)
+})
+
+sceneMessageBus.on('walk', (info: walkMessage) => {
+  stopYelling(info)
 })
 
 // Get distance
@@ -210,7 +211,10 @@ This function really returns distance squared, as it's a lot more efficient to c
 The square root operation is expensive and isn't really necessary if we compare the result to squared values.
 We also use {x,z} not {x,y}. The y-coordinate is how high up it is.
 */
-function distance(pos1: Vector3, pos2: Vector3): number {
+function distance(
+  pos1: Vector3 | ReadOnlyVector3,
+  pos2: Vector3 | ReadOnlyVector3
+): number {
   const a = pos1.x - pos2.x
   const b = pos1.z - pos2.z
   return a * a + b * b
