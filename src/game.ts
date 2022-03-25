@@ -54,7 +54,7 @@ temple.addComponent(
   new Transform({
     position: new Vector3(16, 0, 16),
     rotation: Quaternion.Euler(0, 180, 0),
-    scale: new Vector3(1.6, 1.6, 1.6),
+    scale: new Vector3(1.6, 1.6, 1.6)
   })
 )
 
@@ -62,18 +62,18 @@ temple.addComponent(
 engine.addEntity(temple)
 
 // Create Gnark
-let gnark = new Entity()
+const gnark = new Entity()
 gnark.addComponent(
   new Transform({
-    position: new Vector3(5, 0, 5),
+    position: new Vector3(5, 0, 5)
   })
 )
 
-let gnarkShape = new GLTFShape('models/gnark.glb')
+const gnarkShape = new GLTFShape('models/gnark.glb')
 
 gnark.addComponent(gnarkShape)
 
-let gnarkAnimator = new Animator()
+const gnarkAnimator = new Animator()
 gnark.addComponent(gnarkAnimator)
 // Add LerpData component to Gnark
 gnark.addComponent(new LerpData())
@@ -96,8 +96,8 @@ walkClip.play()
 export class GnarkWalk {
   update(dt: number) {
     if (!gnark.hasComponent(TimeOut) && !raiseDeadClip.playing) {
-      let transform = gnark.getComponent(Transform)
-      let path = gnark.getComponent(LerpData)
+      const transform = gnark.getComponent(Transform)
+      const path = gnark.getComponent(LerpData)
       if (path.fraction < 1) {
         path.fraction += dt / 12
         transform.position = Vector3.Lerp(
@@ -129,8 +129,8 @@ engine.addSystem(new GnarkWalk())
 // Wait System
 export class WaitSystem {
   update(dt: number) {
-    for (let ent of paused.entities) {
-      let time = ent.getComponentOrNull(TimeOut)
+    for (const ent of paused.entities) {
+      const time = ent.getComponentOrNull(TimeOut)
       if (time) {
         if (time.timeLeft > 0) {
           time.timeLeft -= dt
@@ -151,15 +151,15 @@ engine.addSystem(new WaitSystem())
 
 export class BattleCry {
   update() {
-    let transform = gnark.getComponent(Transform)
-    let path = gnark.getComponent(LerpData)
-    let dist = distance(transform.position, camera.position)
+    const transform = gnark.getComponent(Transform)
+    const path = gnark.getComponent(LerpData)
+    const dist = distance(transform.position, camera.position)
     if (dist < 16) {
       if (!path.yelling && !path.yellingAtPlayer) {
         //path.yelling = true
         path.yellingAtPlayer = true
         const action: yellMessage = {
-          playerPos: camera.position,
+          playerPos: camera.position
         }
         sceneMessageBus.emit('yell', action)
       }
@@ -169,7 +169,7 @@ export class BattleCry {
         gnarkPos: transform.position.clone(),
         origin: path.origin,
         target: path.target,
-        fraction: path.fraction,
+        fraction: path.fraction
       }
       sceneMessageBus.emit('walk', action)
     }
@@ -184,17 +184,17 @@ const camera = Camera.instance
 sceneMessageBus.on('yell', (info: yellMessage) => {
   raiseDeadClip.reset()
   raiseDeadClip.play()
-  let transform = gnark.getComponent(Transform)
+  const transform = gnark.getComponent(Transform)
   transform.lookAt(new Vector3(info.playerPos.x, 0, info.playerPos.z))
-  let path = gnark.getComponent(LerpData)
+  const path = gnark.getComponent(LerpData)
   path.yelling = true
   //log(info.playerPos)
 })
 
 sceneMessageBus.on('walk', (info: walkMessage) => {
   walkClip.play()
-  let path = gnark.getComponent(LerpData)
-  let transform = gnark.getComponent(Transform)
+  const path = gnark.getComponent(LerpData)
+  const transform = gnark.getComponent(Transform)
   transform.position = info.gnarkPos
   path.target = info.target
   path.origin = info.origin
@@ -221,13 +221,13 @@ sceneMessageBus.emit('getGameState', {})
 
 // To return the initial state of the scene to new players
 sceneMessageBus.on('getGameState', () => {
-  let transform = gnark.getComponent(Transform)
-  let path = gnark.getComponent(LerpData)
+  const transform = gnark.getComponent(Transform)
+  const path = gnark.getComponent(LerpData)
   const action: walkMessage = {
     gnarkPos: transform.position.clone(),
     origin: path.origin,
     target: path.target,
-    fraction: path.fraction,
+    fraction: path.fraction
   }
   sceneMessageBus.emit('walk', action)
 })
